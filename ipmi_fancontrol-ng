@@ -115,15 +115,9 @@ sub GetCPUTemp
 {
     my $current_cpu_temp = 0;
 
-    my $sensors_output = `ipmi-sensors --no-header-output --comma-separated-output | grep CPU | awk -F "\"*,\"*" '{print $4}'`;
-    my @vals = split("\n", $sensors_output);
-    foreach my $value (@vals)
-    {
-        # Remove the *C from $sensors_output (and anything else thats not numbers or decimal points)
-        my $cpu_temp = `echo $value | sed -e 's/[^0-9. ]*//g' -e 's/ \\+/ /g'`;
-        $current_cpu_temp = max($cpu_temp, $current_cpu_temp);
-    }
-    # Remove trailing line endings
+    my $sensors_output = `ipmi-sensors --no-header-output --comma-separated-output | grep CPU`;
+    my @vals = split(",", $sensors_output);
+    $current_cpu_temp = @vals[3];
     $current_cpu_temp =~ s/\n//g;
 
     return $current_cpu_temp;
