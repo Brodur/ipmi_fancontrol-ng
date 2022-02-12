@@ -115,7 +115,7 @@ sub GetCPUTemp
 {
     my $current_cpu_temp = 0;
 
-    my $sensors_output = `sensors | grep "Package" | sed 's/.*:\\s*+\\(.*\\)  .*(.*/\\1/'`;
+    my $sensors_output = `ipmi-sensors --no-header-output --comma-separated-output | grep CPU | awk -F "\"*,\"*" '{print $4}'`;
     my @vals = split("\n", $sensors_output);
     foreach my $value (@vals)
     {
@@ -179,7 +179,7 @@ sub CalculateScalars
 }
 
 sub UpdateFanSpeed
-{ 
+{
     my $current_cpu_temp = GetCPUTemp();
     my $current_gpu_temp = 0;
 
@@ -217,7 +217,7 @@ sub UpdateFanSpeed
     print FH "fans,host=$hostname speed_percent=$calculated_speed\n";
     print FH "fans,host=$hostname speed_raw=$speed_raw\n";
     close(FH);
-    
+
     SetFanSpeed($desired_fan_speed);
 }
 
